@@ -1,5 +1,3 @@
-// Room.js
-
 class Room {
   constructor(name, bookings = [], rate, discount) {
     this.name = name;
@@ -100,4 +98,36 @@ class Room {
   }
 }
 
-module.exports = Room;
+class Booking {
+  constructor(name, email, checkIn, checkOut, discount, room) {
+    this.name = name;
+    this.email = email;
+    this.checkIn = checkIn;
+    this.checkOut = checkOut;
+    this.discount = discount;
+    this.room = room;
+  }
+
+  fee() {
+    let basePrice = this.room.pricePerNight * this.calculateNightDifference();
+
+    let roomDiscount = (basePrice * this.room.discount) / 100;
+
+    let bookingDiscount = (basePrice * this.discount) / 100;
+
+    let totalFee = basePrice - roomDiscount - bookingDiscount;
+
+    return totalFee;
+  }
+
+  calculateNightDifference() {
+    // Assumes checkOut date is always greater than checkIn date
+    const oneDay = 24 * 60;
+    return Math.round(Math.abs((this.checkIn - this.checkOut) / oneDay));
+  }
+}
+
+module.exports = {
+  Room,
+  Booking,
+};
