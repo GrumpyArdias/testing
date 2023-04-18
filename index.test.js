@@ -77,72 +77,79 @@ describe("isOccupied", () => {
 });
 
 describe("occupancyPercentage", () => {
-  const room = new Room();
-  it("calculates correct occupancy percentage for a range with no bookings", () => {
-    const startDate = new Date("2023-04-01");
-    const endDate = new Date("2023-04-10");
-    const occupancyPercentage = room.occupancyPercentage(startDate, endDate);
-    expect(occupancyPercentage).toBe(0);
+  let room;
+  let bookingOne;
+  let bookingTwo;
+  let bookingThree;
+
+  beforeEach(() => {
+    bookingOne = new Booking(
+      "pepe",
+      "pepe@pepe.com",
+      new Date("11/10/2022"),
+      new Date("11/13/2022"),
+      45
+    );
+    bookingTwo = new Booking(
+      "john",
+      "john@john.com",
+      new Date("11/16/2022"),
+      new Date("11/19/2022"),
+      45
+    );
+    bookingThree = new Booking(
+      "susan",
+      "susan@susan.com",
+      new Date("11/22/2022"),
+      new Date("11/23/2022"),
+      45
+    );
+    bookingFour = new Booking(
+      "emma",
+      "emma@emma.com",
+      new Date("12/1/2022"),
+      new Date("12/5/2022"),
+      45
+    );
+    bookingFive = new Booking(
+      "michael",
+      "michael@michael.com",
+      new Date("12/10/2022"),
+      new Date("12/15/2022"),
+      45
+    );
+    room = new Room("Suite", [bookingOne, bookingTwo, bookingThree], 3500, 35);
   });
 
-  it("calculates correct occupancy percentage for a range with partial bookings", () => {
-    const startDate = new Date("2023-04-19");
-    const endDate = new Date("2023-04-28");
-    const occupancyPercentage = room.occupancyPercentage(startDate, endDate);
-    expect(occupancyPercentage).toBe(50);
+  afterEach(() => {
+    room = null;
+    bookingOne = null;
+    bookingTwo = null;
+    bookingThree = null;
   });
 
-  it("calculates correct occupancy percentage for a range with complete bookings", () => {
-    const startDate = new Date("2023-04-15");
-    const endDate = new Date("2023-04-30");
-    const occupancyPercentage = room.occupancyPercentage(startDate, endDate);
-    expect(occupancyPercentage).toBe(100);
+  test("the start date is after or equal to the end date", () => {
+    expect(
+      room.occupancyPercentage(new Date("11/14/2022"), new Date("11/12/2022"))
+    ).toBe(false);
   });
 
-  // New test case for complete bookings
-  it("calculates correct occupancy percentage for a range with complete bookings", () => {
-    const startDate = new Date("2023-04-01");
-    const endDate = new Date("2023-04-30");
-
-    // Add complete bookings for the entire range
-    room.bookings.push({ checkIn: startDate, checkOut: endDate });
-    const occupancyPercentage = room.occupancyPercentage(startDate, endDate);
-    expect(occupancyPercentage).toBe(100);
+  test("should return 0% occupancy", () => {
+    expect(
+      room.occupancyPercentage(new Date("10/8/2022"), new Date("10/16/2022"))
+    ).toBe(0);
   });
 
-  // New test case for checking if the room is occupied on a given date (should be truthy)
-  it("should be occupied on a given date and return truthy value", () => {
-    const booking = {
-      checkIn: new Date("2023-04-16"),
-      checkOut: new Date("2023-04-18"),
-    };
-    room.bookings.push(booking);
-    const occupied = room.isOccupied(new Date("2023-04-17"));
-
-    // Expect the result to be truthy
-    expect(occupied).toBeTruthy();
+  test("should return the actual percentage of occupancy", () => {
+    expect(
+      room.occupancyPercentage(new Date("11/8/2022"), new Date("11/24/2022"))
+    ).toBeGreaterThanOrEqual(1);
   });
 
-  // New test case for checking if the room is occupied on a given date (should be falsy)
-  it("should not be occupied on a given date and return falsy value", () => {
-    const booking = {
-      checkIn: new Date("2023-04-18"),
-      checkOut: new Date("2023-04-20"),
-    };
-    room.bookings.push(booking);
-
-    const occupied = room.isOccupied(new Date("2023-04-17"));
-
-    // Expect the result to be falsy
-    expect(occupied).toBeFalsy();
-  });
-
-  // New test case for checking if the room is occupied on a given date (should be falsy)
-  it("should not be occupied when there are no bookings and return falsy value", () => {
-    const occupied = room.isOccupied(new Date("2023-04-17"));
-
-    // Expect the result to be falsy
-    expect(occupied).toBeFalsy();
+  test("should return that is 100% occupied", () => {
+    expect(
+      room.occupancyPercentage(new Date("11/10/2022"), new Date("11/13/2022"))
+    ).toBe(100);
   });
 });
 

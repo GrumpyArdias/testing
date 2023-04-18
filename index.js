@@ -21,25 +21,27 @@ class Room {
   }
 
   occupancyPercentage(startDate, endDate) {
-    let totalDays = 0;
-    let occupiedDays = 0;
+    let differenceDates = Math.abs(startDate.getTime() - endDate.getTime());
+    let percentage = 0;
 
-    const startTimestamp = startDate.getTime();
-    const endTimestamp = endDate.getTime();
-
-    for (
-      let currentTimestamp = startTimestamp;
-      currentTimestamp <= endTimestamp;
-      currentTimestamp += 86400000
-    ) {
-      const currentDate = new Date(currentTimestamp);
-      totalDays++;
-      if (this.isOccupied(currentDate)) {
-        occupiedDays++;
-      }
+    if (startDate.getTime() >= endDate.getTime()) {
+      return false;
     }
 
-    return (occupiedDays / totalDays) * 100;
+    this.bookings.forEach((booking) => {
+      if (
+        booking.checkIn.getTime() >= startDate.getTime() &&
+        booking.checkOut.getTime() <= endDate.getTime()
+      ) {
+        percentage += Math.abs(
+          booking.checkIn.getTime() - booking.checkOut.getTime()
+        );
+      }
+    });
+
+    return percentage === 0
+      ? percentage
+      : Number(((percentage * 100) / differenceDates).toFixed(0));
   }
 
   static totalOccupancyPercentage(rooms, startDate, endDate) {
