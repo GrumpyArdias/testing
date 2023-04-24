@@ -13,6 +13,8 @@ describe("Room", () => {
   // Test case for property initialization with incorrect values
   test("should not initialize properties with incorrect values", () => {
     const room2 = new Room(null, undefined, "invalid", "invalid");
+
+    
     expect(room2.name).toBeNull();
     expect(room2.bookings).toBeUndefined();
     expect(room2.rate).toBeNaN();

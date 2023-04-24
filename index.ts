@@ -1,12 +1,17 @@
 class Room {
-  constructor(name, bookings = [], rate, discount) {
+  name: string;
+  bookings: Booking[];
+  rate: number;
+  discount: number;
+
+  constructor(name: string, bookings: Booking[], rate: number, discount: number) {
     this.name = name;
     this.bookings = bookings;
     this.rate = rate;
     this.discount = discount;
   }
 
-  isOccupied(date) {
+  isOccupied(date: Date): boolean {
     let occupied = false;
 
     this.bookings.forEach((booking) => {
@@ -17,10 +22,11 @@ class Room {
         occupied = true;
       }
     });
+
     return occupied;
   }
 
-  occupancyPercentage(startDate, endDate) {
+  occupancyPercentage(startDate: Date, endDate: Date): number | false {
     let differenceDates = Math.abs(startDate.getTime() - endDate.getTime());
     let percentage = 0;
 
@@ -44,7 +50,7 @@ class Room {
       : Number(((percentage * 100) / differenceDates).toFixed(0));
   }
 
-  static totalOccupancyPercentage(rooms, startDate, endDate) {
+  static totalOccupancyPercentage(rooms: Room[], startDate: Date, endDate: Date): number {
     let totalOccupiedDays = 0;
     let totalDays = 0;
 
@@ -69,8 +75,8 @@ class Room {
     return (totalOccupiedDays / totalDays) * 100;
   }
 
-  static availableRooms(rooms, startDate, endDate) {
-    const availableRooms = [];
+  static availableRooms(rooms: Room[], startDate: Date, endDate: Date): Room[] {
+    const availableRooms: Room[] = [];
 
     for (let i = 0; i < rooms.length; i++) {
       const room = rooms[i];
@@ -101,7 +107,14 @@ class Room {
 }
 
 class Booking {
-  constructor(name, email, checkIn, checkOut, discount, room) {
+  name: string;
+  email: string;
+  checkIn: Date;
+  checkOut: Date;
+  discount: number;
+  room: { pricePerNight: number; discount: number; };
+
+  constructor(name: string, email: string, checkIn: Date, checkOut: Date, discount: number, room: { pricePerNight: number; discount: number; }) {
     this.name = name;
     this.email = email;
     this.checkIn = checkIn;
@@ -110,7 +123,7 @@ class Booking {
     this.room = room;
   }
 
-  fee() {
+  fee(): number {
     let basePrice = this.room.pricePerNight * this.calculateNightDifference();
 
     let roomDiscount = (basePrice * this.room.discount) / 100;
@@ -122,10 +135,10 @@ class Booking {
     return totalFee;
   }
 
-  calculateNightDifference() {
+  calculateNightDifference(): number {
     // Assumes checkOut date is always greater than checkIn date
-    const oneDay = 24 * 60;
-    return Math.round(Math.abs((this.checkIn - this.checkOut) / oneDay));
+    const oneDay = 24 * 60 * 60 * 1000;
+    return Math.round(Math.abs((this.checkIn.getTime() - this.checkOut.getTime()) / oneDay));
   }
 }
 
